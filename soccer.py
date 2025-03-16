@@ -1,7 +1,6 @@
 '''
 ICS3U - Python Project
 Name: soccer.py 
-By: Swanish and Selina
 Date: April idk
 Description: Basically soccer (watched youtube tutorial)
 '''
