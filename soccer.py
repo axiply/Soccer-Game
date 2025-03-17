@@ -17,7 +17,7 @@ def ball_movement():
     soccer_ball.y += soccer_ball_speed_vertical
 
     # ensuring the ball doesnt go out of bounds
-    if soccer_ball.top <= 0 or soccer_ball.bottom >= screen_height:
+    if soccer_ball.bottom <= 0 or soccer_ball.top >= screen_height:
         soccer_ball_speed_vertical *= -1
     
     if soccer_ball.left <= 0 or soccer_ball.right >= screen_width:
