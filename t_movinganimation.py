@@ -1,24 +1,12 @@
 import pygame
 
 pygame.init()
-window = pygame.display.set_mode((600, 600))
+window = pygame.display.set_mode((1280, 960))
 clock = pygame.time.Clock()
 
-corner_points = [(100, 100), (300, 300), (300, 100), (100, 300)]
-pos = corner_points[0]
-speed = 2
 
-def move(pos, speed, points):
-    direction = pygame.math.Vector2(points[0]) - pos
-    if direction.length() <= speed:
-        pos = points[0]
-        points.append(points[0])
-        points.pop(0)
-    else:
-        direction.scale_to_length(speed)
-        new_pos = pygame.math.Vector2(pos) + direction
-        pos = (new_pos.x, new_pos.y) 
-    return pos
+pos = pygame.math.Vector2(634,480)
+velocity = pygame.math.Vector2(2,0)
 
 soccerball = pygame.transform.scale(pygame.image.load('soccerball.png'),(50,50))
 image = soccerball.convert_alpha()
@@ -30,11 +18,16 @@ while run:
         if event.type == pygame.QUIT:
             run = False
 
-    pos = move(pos, speed, corner_points)
-    image_rect = image.get_rect(center = pos)
+    pos += velocity 
+
+    if pos.x + 25 >= 960 or pos.x - 25 <= 320:
+        velocity.x *= -1
+    if pos.y + 25 >= 960 or pos.y - 25 <= 320:
+        velocity.y *= -1
            
     window.fill(0)
     #pygame.draw.lines(window, "gray", True, corner_points) 
+    image_rect = image.get_rect(center = (pos.x,pos.y))
     window.blit(image, image_rect)
     pygame.display.update()
 
