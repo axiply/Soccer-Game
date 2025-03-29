@@ -81,6 +81,28 @@ def ball_restart():
     soccer_ball_speed_x = 7 * random.choice((1, -1))
     soccer_ball_speed_y = 7 * random.choice((1, -1))
 
+def loading_screen():
+    # Define fonts and text
+    font = pygame.font.SysFont("monospace", 40)
+    text = font.render("Press any key to continue...", True, pygame.Color("white"))
+    text_rect = text.get_rect(center=(screen_width // 2, screen_height // 2))
+
+    # Display the message and wait for a key press
+    screen.fill(background_color)
+    screen.blit(text, text_rect)
+    pygame.display.flip()
+
+    # Wait for a key press to continue
+    waiting = True
+    while waiting:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN:
+                waiting = False  # exit the loop when a key is pressed
+        clock.tick(30)
+
 # setting up the game
 pygame.init()
 clock = pygame.time.Clock()
@@ -92,8 +114,8 @@ screen = pygame.display.set_mode((screen_width, screen_height))
 pygame.display.set_caption("Soccer Pong")
 
 # speeds
-soccer_ball_speed_x = 7 * random.choice((1, -1))
-soccer_ball_speed_y = 7 * random.choice((1, -1))
+soccer_ball_speed_x = 7 * random.choice((2, -2, -1, 1))
+soccer_ball_speed_y = 7 * random.choice((1, -1, 2, -2))
 speed_player_x = 0
 speed_player_y = 0
 speed_opposing_player = 4
@@ -121,9 +143,14 @@ try:
     mixer.music.load("football_chant.wav")
     mixer.music.play(-1)
 except pygame.error:
-    print("warning: sound file missing!")
+    print("Warning, there is no sound file loaded!")
 
-while True:
+# Display loading screen and wait for key press
+loading_screen()
+
+# Start the game after loading screen
+running = True
+while running:
     # handling events
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -169,7 +196,6 @@ while True:
         goalie_movement(player_goalie, 'down')
     else:
         goalie_movement(player_goalie, 'up')
-
 
     # draw everything on the screen
     screen.fill(background_color)
