@@ -4,8 +4,49 @@ from pygame.locals import *
 import sys
 import random
 
-# clock initialized
+# setting up the game
+pygame.init()
 clock = pygame.time.Clock()
+
+# setting up the main window
+screen_width = 1280
+screen_height = 960
+screen = pygame.display.set_mode((screen_width, screen_height))
+pygame.display.set_caption("Soccer Pong")
+
+# speeds
+soccer_ball_speed_x = 7 * random.choice((2, -2, -1, 1))
+soccer_ball_speed_y = 7 * random.choice((1, -1, 2, -2))
+speed_player_x = 0
+speed_player_y = 0
+speed_opposing_player = 4
+
+# objects
+soccer_ball = pygame.Rect(screen_width/2 - 16, screen_height/2 - 16, 32, 32)
+player = pygame.Rect(screen_width - 60, screen_height/2 - 50, 50, 50)
+opposing_player = pygame.Rect(10, screen_height/2 - 50, 50, 50)
+player_goalie = pygame.Rect(screen_width - 90, screen_height/2 - 80, 30, 160)  # right side goalie
+opposing_goalie = pygame.Rect(60, screen_height/2 - 80, 30, 160)  # left side goalie
+
+# load custom player images
+player_image = pygame.image.load("character.png")  
+opposing_player_image = pygame.image.load("ronaldo.png")
+
+
+# scale the images
+player_image = pygame.transform.scale(player_image, (100, 100))
+opposing_player_image = pygame.transform.scale(opposing_player_image, (100, 100))
+
+background_color = pygame.Color("grey11")
+grey_color = (205, 205, 200)
+
+# music
+try:
+    mixer.music.load("football_chant.wav")
+    mixer.music.play(-1)
+except pygame.error:
+    print("Warning, there is no sound file loaded!")
+
 
 def ball_movement():
     global soccer_ball_speed_x, soccer_ball_speed_y
@@ -103,50 +144,49 @@ def loading_screen():
                 waiting = False  # exit the loop when a key is pressed
         clock.tick(30)
 
-# setting up the game
-pygame.init()
-clock = pygame.time.Clock()
+# settings & images for animation
+pos = pygame.math.Vector2(346,480)
+velocity = pygame.math.Vector2(4,0)
+i_soccerball = pygame.transform.scale(pygame.image.load('soccer_ball.png'),(50,50)) 
+soccerball_image = i_soccerball.convert_alpha()
 
-# setting up the main window
-screen_width = 1280
-screen_height = 960
-screen = pygame.display.set_mode((screen_width, screen_height))
-pygame.display.set_caption("Soccer Pong")
+# function to draw starting animation
+def loading_animation():
+    global pos 
+    waiting = True
 
-# speeds
-soccer_ball_speed_x = 7 * random.choice((2, -2, -1, 1))
-soccer_ball_speed_y = 7 * random.choice((1, -1, 2, -2))
-speed_player_x = 0
-speed_player_y = 0
-speed_opposing_player = 4
+    while waiting: 
+        pos += velocity 
 
-# objects
-soccer_ball = pygame.Rect(screen_width/2 - 16, screen_height/2 - 16, 32, 32)
-player = pygame.Rect(screen_width - 60, screen_height/2 - 50, 50, 50)
-opposing_player = pygame.Rect(10, screen_height/2 - 50, 50, 50)
-player_goalie = pygame.Rect(screen_width - 90, screen_height/2 - 80, 30, 160)  # right side goalie
-opposing_goalie = pygame.Rect(60, screen_height/2 - 80, 30, 160)  # left side goalie
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()  # Ensure program exits cleanly
 
-# load custom player images
-player_image = pygame.image.load("character.png")  
-opposing_player_image = pygame.image.load("ronaldo.png")  
+        pos += velocity  # Move the soccer ball
 
-# scale the images
-player_image = pygame.transform.scale(player_image, (100, 100))
-opposing_player_image = pygame.transform.scale(opposing_player_image, (100, 100))
+        if pos.x + 25 >= 960:  # When animation reaches the end
+            waiting = False  # Stop loop
+            velocity.x = 0  # Stop movement
+            screen.fill(0)
+            pygame.display.update()
+            return  # Exit the function cleanly
 
-background_color = pygame.Color("grey11")
-grey_color = (205, 205, 200)
+        # Continue animating
+        screen.fill(0)
+        image_rect = soccerball_image.get_rect(center=(pos.x, pos.y))
+        screen.blit(soccerball_image, image_rect)
+        pygame.display.update()
+        clock.tick(40)
 
-# music
-try:
-    mixer.music.load("football_chant.wav")
-    mixer.music.play(-1)
-except pygame.error:
-    print("Warning, there is no sound file loaded!")
+status = "loading screen"
 
-# Display loading screen and wait for key press
-loading_screen()
+if status == "loading screen":
+    #starting loading animation
+    loading_animation()
+    # Display loading screen and wait for key press
+    loading_screen()
+    status = "level 1"
 
 # Start the game after loading screen
 running = True
