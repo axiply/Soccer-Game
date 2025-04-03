@@ -144,6 +144,35 @@ def loading_screen():
                 waiting = False  # exit the loop when a key is pressed
         clock.tick(30)
 
+def level_screen():
+    # define fonts and text
+    font = pygame.font.SysFont("monospace", 40)
+    text = font.render(status, True, pygame.Color("white"))
+    text_rect = text.get_rect(center=(screen_width // 2, screen_height // 2))
+
+    # display the message and wait for a key press
+    screen.fill(background_color)
+    screen.blit(text, text_rect)
+    pygame.display.flip()
+
+    start_time = pygame.time.get_ticks()  # Get current time in milliseconds
+    waiting = True
+
+    # wait 2 seconds or press key to continue
+    while waiting:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN:
+                waiting = False  # Exit loop when a key is pressed
+
+        # check if 2 seconds (2000 milliseconds) have passed
+        if pygame.time.get_ticks() - start_time >= 2000:
+            waiting = False  # exit loop after 2 seconds
+
+        clock.tick(30)
+
 # settings & images for animation
 pos = pygame.math.Vector2(346,480)
 velocity = pygame.math.Vector2(4,0)
@@ -179,6 +208,8 @@ def loading_animation():
         pygame.display.update()
         clock.tick(40)
 
+
+levels = ["Level 1","Level 2","Level 3","Level 4","Level 5"]
 status = "loading screen"
 
 if status == "loading screen":
@@ -186,7 +217,11 @@ if status == "loading screen":
     loading_animation()
     # Display loading screen and wait for key press
     loading_screen()
-    status = "level 1"
+    status = "Level 1"
+
+if status in levels:
+    level_screen()
+# **** alterations of above code will have to take place after with more code
 
 # Start the game after loading screen
 running = True
