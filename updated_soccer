@@ -165,8 +165,92 @@ def screen_switcher():
     else:
         level_5()
 
-# insert loading screen function here ()
 
+# function to draw loading animation
+def loading_animation():
+    pos = pygame.math.Vector2(346,480)
+    velocity = pygame.math.Vector2(4,0)
+    i_soccerball = pygame.transform.scale(pygame.image.load('soccer_ball.png'),(50,50)) 
+    soccerball_image = i_soccerball.convert_alpha()
+
+    waiting = True
+
+    while waiting: 
+        pos += velocity 
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()  
+
+        pos += velocity  # move the soccer ball
+
+        if pos.x + 25 >= 960:  # when animation reaches the end
+            waiting = False  
+            velocity.x = 0  
+            screen.fill(0)
+            pygame.display.update()
+            return  
+
+        # continue animating
+        screen.fill(0)
+        image_rect = soccerball_image.get_rect(center=(pos.x, pos.y))
+        screen.blit(soccerball_image, image_rect)
+        pygame.display.update()
+        clock.tick(40)
+
+# function for the loading screen
+def loading_screen():
+    # define fonts and text
+    font = pygame.font.SysFont("monospace", 40)
+    text = font.render("Press any key to continue...", True, pygame.Color("white"))
+    text_rect = text.get_rect(center=(screen_width // 2, screen_height // 2))
+
+    # display the message and wait for a key press
+    screen.fill(background_color)
+    screen.blit(text, text_rect)
+    pygame.display.flip()
+
+    # wait for a key press to continue
+    waiting = True
+    while waiting:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN:
+                waiting = False  # exit the loop when a key is pressed
+        clock.tick(30)
+
+# function for screen in between levels
+def level_screen(level):
+    # define fonts and text
+    font = pygame.font.SysFont("monospace", 40)
+    text = font.render(level, True, pygame.Color("white"))
+    text_rect = text.get_rect(center=(screen_width // 2, screen_height // 2))
+
+    # display the message and wait for a key press
+    screen.fill(background_color)
+    screen.blit(text, text_rect)
+    pygame.display.flip()
+
+    start_time = pygame.time.get_ticks()  # Get current time in milliseconds
+    waiting = True
+
+    # wait 2 seconds or press key to continue
+    while waiting:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN:
+                waiting = False  # Exit loop when a key is pressed
+
+        # check if 2 seconds (2000 milliseconds) have passed
+        if pygame.time.get_ticks() - start_time >= 2000:
+            waiting = False  # exit loop after 2 seconds
+
+        clock.tick(30)
 
 # restart the ball
 def ball_restart():
@@ -244,7 +328,7 @@ def init_game():
     pygame.display.set_caption("Mohammed's Soccer")
 
     # setting up the background and scaling the images
-    background_image = pygame.image.load("/Users/swanishbaweja/Pygame project (NEW)/soccerfields/1.png") 
+    background_image = pygame.image.load('1.png') 
     background_image = pygame.transform.scale(background_image, (screen_width, screen_height)) 
 
     # ball speeds
@@ -263,7 +347,7 @@ def init_game():
     # upload the IMAGES
     player_image = pygame.image.load("character.png")  
     ronaldo_image = pygame.image.load("ronaldo.png")  
-    boss_image = pygame.image.load("boss.png")
+    #boss_image = pygame.image.load("boss.png")
 
     # resize they images because they were too bigg
     player_image = pygame.transform.scale(player_image, (100, 100))
@@ -295,6 +379,7 @@ def init_game():
 
 # level one function
 def level_1():
+    level_screen("Level 1")
     # add player_image and other required variables to global
     global player_score, opponent_score, coins, soccer_ball, player, ronaldo, player_goalie, other_goalie, player_image, player_image_original, ronaldo_image
 
@@ -752,6 +837,8 @@ def level_3():
 
 def main():
     clock = init_game()
+    loading_animation()
+    loading_screen()
     level_1()
 
 if __name__ == "__main__":

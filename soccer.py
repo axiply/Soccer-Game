@@ -144,10 +144,10 @@ def loading_screen():
                 waiting = False  # exit the loop when a key is pressed
         clock.tick(30)
 
-def level_screen():
+def level_screen(level):
     # define fonts and text
     font = pygame.font.SysFont("monospace", 40)
-    text = font.render(status, True, pygame.Color("white"))
+    text = font.render(level, True, pygame.Color("white"))
     text_rect = text.get_rect(center=(screen_width // 2, screen_height // 2))
 
     # display the message and wait for a key press
