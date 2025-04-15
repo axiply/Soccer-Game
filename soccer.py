@@ -346,7 +346,7 @@ def init_game():
     pygame.display.set_caption("Mohammed's Soccer")
 
     # setting up the background and scaling the images
-    background_image = pygame.image.load('/Users/swanishbaweja/Pygame project (NEW)/soccerfields/1.png') 
+    background_image = pygame.image.load('1.png') 
     background_image = pygame.transform.scale(background_image, (screen_width, screen_height)) 
 
     # ball speeds
@@ -746,7 +746,7 @@ def level_3():
     flash_interval = 200  
     flash_colors = [(255, 255, 255), grey_color] 
 
-    background_image = pygame.image.load("/Users/swanishbaweja/Pygame project (NEW)/soccerfields/3.png")
+    background_image = pygame.image.load("3.png")
     background_image = pygame.transform.scale(background_image, (screen_width, screen_height))
 
     game_length_time = 240
@@ -764,7 +764,7 @@ def level_3():
     pygame.time.set_timer(puddle_timer, 15000)
     
     weather_timer = pygame.USEREVENT + 5
-    pygame.time.set_timer(weather_timer, 20000)
+    pygame.time.set_timer(weather_timer, 10000)
     
     fan_cheer_timer = pygame.USEREVENT + 6
     pygame.time.set_timer(fan_cheer_timer, 12000)
@@ -1154,7 +1154,7 @@ def main():
     loading_screen()
     level_1()
     level_3()
-    level_5()
+    #level_5()
     
 
 if __name__ == "__main__":
