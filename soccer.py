@@ -130,41 +130,7 @@ def goalie_movement(goalie, where):
     if where == 'down' and goalie.bottom < screen_height:
         goalie.y += 4
 
-# when the game ends
-def game_over_screen():
-
-    # text
-    font = pygame.font.SysFont("monospace", 60)
-
-    # show who won?!?
-    if player_score >= 5:
-        text = font.render("You Win!", True, pygame.Color("green"))
-
-    elif opponent_score >= 5:
-        text = font.render("OMG RONALDO WINS!!!!!!", True, pygame.Color("red"))
-    else:
-        text = font.render("WHAT?? YOU TIED!??!", True, pygame.Color("yellow"))
-
-    # displaying the score
-    text_box_thing = text.get_rect(center=(screen_width // 2, screen_height // 2))
-    show_score = font.render(f"{opponent_score} - {player_score}", True, pygame.Color("white"))
-    score_box = show_score.get_rect(center=(screen_width // 2, screen_height // 2 + 80))
-    
-    coin_display = font.render(f"Coins: {coins}", True, pygame.Color("gold"))
-    coin_box = coin_display.get_rect(center=(screen_width // 2, screen_height // 2 + 160))
-
-    # display teh text
-    screen.fill(background_color)  
-    screen.blit(text, text_box_thing)
-    screen.blit(show_score, score_box)
-    screen.blit(coin_display, coin_box)
-    pygame.display.flip()
-
-    # wait to let the user read it for 3 sec befor exiting
-    pygame.time.delay(3000)  
-    pygame.quit()
-    sys.exit()
-
+level1 = True
 def screen_switcher():
     if level1:
         level_1()
@@ -176,7 +142,6 @@ def screen_switcher():
         level_4()
     else:
         level_5()
-
 
 # function to draw loading animation
 def loading_animation():
@@ -298,7 +263,7 @@ def clock_time(seconds):
 
 # check if the ball is in a goal
 def check_goal():
-    global player_score, opponent_score, goal_scored, goal_time, goal_side
+    global player_score, opponent_score, goal_scored, goal_time, goal_side, current_l, next_l
     
     if soccer_ball.left <= 0:
         player_score += 1
@@ -313,7 +278,7 @@ def check_goal():
         goal_side = "right" 
     
     if player_score >= 5 or opponent_score >= 5:
-        level_transition_screen(1, 3) 
+        level_transition_screen(current_l, next_l) 
         return
 
 # create a POWERUP!
@@ -325,8 +290,17 @@ def create_powerup():
     powerup_box = pygame.Rect(power_x, power_y, 30, 30)
     return {'rect': powerup_box, 'type': powerup_type}
 
+def create_powerup_level2():
+    powerup_type = random.choice(['size','speed','ball-back'])
+    power_x = random.randint(100, screen_width - 100)
+    power_y = random.randint(100, screen_height - 100)
+
+    powerup_box = pygame.Rect(power_x,power_y, 30, 30)
+    return {'rect': powerup_box, 'type': powerup_type}
+
 # make the coin (remember to add shop as student requested shop)
 def create_coin():
+
     coin_x = random.randint(100, screen_width - 100)
     coin_y = random.randint(100, screen_height - 100)
     
@@ -396,14 +370,12 @@ def init_game():
     return clock
 
 def level_transition_screen(current_level, next_level):
-    global level1, level2, level3, level4, level5
+    global level1, level2, level3, level4, level5, player_score, opponent_score, current_l, next_l
     
     font_large = pygame.font.SysFont("monospace", 40)
     font_small = pygame.font.SysFont("monospace", 30)
     
     countdown_seconds = 10
-    player_score = 0
-    opponent_score = 0
     countdown_event = pygame.USEREVENT + 10
     pygame.time.set_timer(countdown_event, 1000)
     
@@ -441,21 +413,18 @@ def level_transition_screen(current_level, next_level):
         pygame.display.flip()
         clock.tick(60)
     
-    if next_level == 1:
+    if next_level == "1":
         level1 = True
         level2 = level3 = level4 = level5 = False
-    elif next_level == 2:
+    elif next_level == "2":
         level2 = True
         level1 = level3 = level4 = level5 = False
-    elif next_level == 3:
+    elif next_level == "3":
         level3 = True
         level1 = level2 = level4 = level5 = False
-    elif next_level == 4:
+    elif next_level == "4":
         level4 = True 
         level1 = level2 = level3 = level5 = False
-    elif next_level == 5:
-        level5 = True
-        level1 = level2 = level3 = level4 = False
     
     screen_switcher()
     
@@ -464,8 +433,10 @@ def level_transition_screen(current_level, next_level):
 def level_1():
     level_screen("Level 1: The Beginnings")
     # add player_image and other required variables to global
-    global player_score, opponent_score, coins, soccer_ball, player, ronaldo, player_goalie, other_goalie, player_image, player_image_original, ronaldo_image, goal_scored, goal_time, goal_side
+    global player_score, opponent_score, coins, soccer_ball, player, ronaldo, player_goalie, other_goalie, player_image, player_image_original, ronaldo_image, goal_scored, goal_time, goal_side, current_l, next_l
 
+    current_l = "1"
+    next_l = "2"
     
     # level 1 specific settings
     game_length_time = 300
@@ -522,7 +493,7 @@ def level_1():
             if event.type == timer_running:
                 time_remaining -= 1
                 if time_remaining <= 0:
-                    level_transition_screen(1, 3) 
+                    level_transition_screen("1","2") 
                     return
             
             # limited powerups allowed
@@ -598,6 +569,7 @@ def level_1():
         # if the speed boost is on for more than the alloted time, turn it off
         if speed_on and current_time > time_left_speed_boost:
             speed_on = False
+
 
         # call the moving ball funcitons
         moving_ball()
@@ -726,11 +698,320 @@ def level_1():
         pygame.display.flip()
         clock.tick(60)
 
+def level_2():
+    level_screen("Level 2: [Insert Cool Name]")
+    # add player_image and other required variables to global
+    global player_score, opponent_score, coins, soccer_ball, player, ronaldo, player_goalie, other_goalie, player_image, player_image_original, ronaldo_image, level_num, x_ball_speed,y_ball_speed, goal_scored, current_l, next_l
+
+    # level 2 specific settings
+    current_l = "2"
+    next_l = "3"
+
+    x_ball_speed = 0
+    y_ball_speed = 0
+    soccer_ball.center = (screen_width/2, screen_height/2)
+    ball_activated = False
+    
+    background_image = pygame.image.load('2.png') 
+    background_image = pygame.transform.scale(background_image, (screen_width, screen_height)) 
+
+    game_length_time = 120
+
+    #resetting
+    player_score = 0
+    opponent_score = 0
+    coins = 0
+    ball_activated = False
+    
+    # set up timers
+    timer_running = pygame.USEREVENT + 1
+    pygame.time.set_timer(timer_running, 1000)
+
+    powerup_running = pygame.USEREVENT + 2
+    pygame.time.set_timer(powerup_running, 5000)  # new powerup every 5 seconds
+
+    coin_running = pygame.USEREVENT + 3
+    pygame.time.set_timer(coin_running, 5000)  # new coin every 5 seconds
+
+
+    # game variables
+    running = True
+    time_remaining = game_length_time
+
+    # powerup variables
+    powerups = []
+    time_left_size_boost = 0
+    time_left_speed_boost = 0
+    time_left_ball_back_text = 0
+    normal_player_speed = 8
+    boosted_player_speed = 14
+    size_on = False
+    speed_on = False
+    ball_back = False
+
+    # input tracking (added to mitigate randomly moving error)
+    key_down = False
+    key_up = False
+    key_left = False
+    key_right = False
+
+    # initialize the delayed ball spawning 
+    goal_scored = False
+    goal_time = 0
+    goal_side = ""
+    flash_interval = 200  # milliseconds between flashes
+    flash_colors = [(255, 255, 255), grey_color]  # White and original color
+
+    # coins
+    coin_object = []
+    
+    # while its running
+    while running:
+        current_time = time.time()
+        
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            
+            # timer
+            if event.type == timer_running:
+                time_remaining -= 1
+                if time_remaining <= 0:
+                    level_transition_screen(2,3)
+                    return
+            
+            # limited powerups allowed
+            if event.type == powerup_running:
+                if len(powerups) < 5: 
+                    powerups.append(create_powerup_level2())
+                    
+            if event.type == coin_running:
+                if len(coin_object) < 5:  
+                    coin_object.append(create_coin())
+
+
+# tracking the buttons pressed on the user's keyboard
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_DOWN:
+                    key_down = True
+
+                if event.key == pygame.K_UP:
+                    key_up = True
+
+                if event.key == pygame.K_LEFT:
+                    key_left = True
+
+                if event.key == pygame.K_RIGHT:
+                    key_right = True
+                    
+            if event.type == pygame.KEYUP:
+                if event.key == pygame.K_DOWN:
+                    key_down = False
+
+                if event.key == pygame.K_UP:
+                    key_up = False
+
+                if event.key == pygame.K_LEFT:
+                    key_left = False
+
+                if event.key == pygame.K_RIGHT:
+                    key_right = False
+
+        speed_player_x = 0
+        speed_player_y = 0
+
+        # if speed boost is on, set the speed to the boosted speed
+        if speed_on:
+            current_speed = boosted_player_speed
+        else:
+            current_speed = 8
+
+        # if the key is down, make him move on the speed it is currently on
+        if key_down:
+            speed_player_y = current_speed
+
+        if key_up:
+            speed_player_y = -current_speed
+
+        if key_left:
+            speed_player_x = -current_speed
+
+        if key_right:
+            speed_player_x = current_speed
+
+        if size_on and current_time > time_left_size_boost:
+            size_on = False
+            
+            original_center = player.center
+            
+            player_image = player_image_original.copy()
+            
+            # reset back to normla dimension
+            player.width, player.height = 100, 100
+            
+            player.center = original_center
+
+        # if the speed boost is on for more than the alloted time, turn it off
+        if speed_on and current_time > time_left_speed_boost:
+            speed_on = False
+
+        if ball_back and current_time > time_left_ball_back_text:
+            ball_back = False
+
+        # call the moving ball funcitons
+        if ball_activated or key_down or key_up or key_left or key_right:
+            if not ball_activated:
+                # Initialize ball speed only once when first key is pressed
+                x_ball_speed = 9 * random.choice((2, -2, -1, 1))
+                y_ball_speed = 9 * random.choice((1, -1, 2, -2))
+                ball_activated = True
+            moving_ball()
+        
+        player.x += speed_player_x
+        player.y += speed_player_y
+        player_out_of_bounds()
+        ronaldo_movement()
+
+        powerups_to_remove = []
+        for i, powerup in enumerate(powerups):
+            if player.colliderect(powerup['rect']):
+
+                # if the player touches a SIZING poweruo they get bigger
+                if powerup['type'] == 'size':
+                    size_on = True
+                    time_left_size_boost = current_time + 30
+                    original_center = player.center
+                    player_image = pygame.transform.scale(player_image_original, (150, 150))
+                    
+                    # make the collision box match the larger image 150x150
+                    player.width, player.height = 150, 150
+                    player.center = original_center
+                    
+                # if the player touches a SPEED powerup they get faster
+                elif powerup['type'] == 'speed':
+                    speed_on = True
+                    time_left_speed_boost = current_time + 30
+
+                 # if the player touches a BALL BACK powerup, the ball goes to their position
+                elif powerup['type'] == 'ball-back':
+                    ball_back = True
+                    time_left_ball_back_text = current_time + 2
+                    soccer_ball.x = player.x+5
+                    soccer_ball.y = player.y
+
+                powerups_to_remove.append(i)
+
+                
+        for i in sorted(powerups_to_remove, reverse=True):
+            powerups.pop(i)
+        
+        coins_to_remove = []
+        for i, coin in enumerate(coin_object):
+            if player.colliderect(coin):
+                coins += 1
+                coins_to_remove.append(i)
+        
+        # remove collected coins
+        for i in sorted(coins_to_remove, reverse=True):
+            coin_object.pop(i)
+
+        if soccer_ball.y > other_goalie.centery:
+            goalie_movement(other_goalie, 'down')
+        else:
+            goalie_movement(other_goalie, 'up')
+
+        if soccer_ball.y > player_goalie.centery:
+            goalie_movement(player_goalie, 'down')
+        else:
+            goalie_movement(player_goalie, 'up')
+
+        screen.blit(background_image, (0, 0))
+
+        # draw powerups
+        for powerup in powerups:
+            if powerup['type'] == 'size':
+                pygame.draw.rect(screen, (255, 0, 0), powerup['rect'])  # red for size
+            elif powerup['type'] == 'speed':
+                pygame.draw.rect(screen, (0, 255, 0), powerup['rect'])  # green for speed
+            elif powerup['type'] == 'ball-back':
+                pygame.draw.rect(screen, (138,43,226), powerup['rect']) # blue for ball to come back to player
+        
+        # draw coins
+        for coin in coin_object:
+            pygame.draw.ellipse(screen, (255, 215, 0), coin)  # Gold color for coins
+
+        # draw everything
+        screen.blit(player_image, player)
+        screen.blit(ronaldo_image, ronaldo)
+        pygame.draw.rect(screen, grey_color, player_goalie)
+        pygame.draw.rect(screen, grey_color, other_goalie)
+        pygame.draw.ellipse(screen, grey_color, soccer_ball)
+        pygame.draw.aaline(screen, grey_color, (screen_width/2, 0), (screen_width/2, screen_height))
+        
+        # have the timer text displayed
+        timer_text = timer_font.render(f"Time: {clock_time(time_remaining)}", True, timer_color)
+        screen.blit(timer_text, (screen_width//2 - 70, 20))
+        
+        score_text = score_font.render(f"{opponent_score} - {player_score}", True, timer_color)
+        screen.blit(score_text, (screen_width//2 - 60, 60))
+        
+        # display coin count
+        coin_text = timer_font.render(f"Coins: {coins}", True, (255, 215, 0))
+        screen.blit(coin_text, (screen_width - 200, 20))
+        
+        # display active powerups
+        if size_on:
+            size_text = timer_font.render("Size Boost!", True, (255, 0, 0))
+            screen.blit(size_text, (20, 20))
+        
+        if speed_on:
+            speed_text = timer_font.render("Speed Boost!", True, (0, 255, 0))
+            screen.blit(speed_text, (20, 60))
+
+        if ball_back:
+            back_text = timer_font.render("You have the ball!", True, (0, 0, 255))
+            screen.blit(back_text,(20,100))
+
+        # Handle goal animation and delayed respawn
+        if goal_scored:
+            current_time = pygame.time.get_ticks()
+            time_since_goal = current_time - goal_time
+            
+            # Flash the appropriate goalie
+            if time_since_goal < 5000:  # During the 5 second delay
+                flash_index = (time_since_goal // flash_interval) % 2
+                flash_color = flash_colors[flash_index]
+                
+                if goal_side == "left":
+                    # Left goal was scored on, flash the left goalie
+                    pygame.draw.rect(screen, flash_color, other_goalie)
+                else:
+                    # Right goal was scored on, flash the right goalie
+                    pygame.draw.rect(screen, flash_color, player_goalie)
+                    
+                # Display "GOAL!" text
+                goal_font = pygame.font.SysFont("monospace", 80)
+                goal_text = goal_font.render("GOAL!", True, (255, 0, 0))
+                screen.blit(goal_text, (screen_width//2 - goal_text.get_width()//2, screen_height//2 - 40))
+            else:
+                # After 5 seconds, reset the ball and clear the goal state
+                goal_scored = False
+                ball_restart()
+                x_ball_speed = 10 * random.choice((1, -1))
+                y_ball_speed = 10 * random.choice((1, -1))
+        
+        pygame.display.flip()
+        clock.tick(60)
+
 def level_3():
     level_screen("Level 3 - Double Trouble")
     
-    global player_score, opponent_score, coins, soccer_ball, player, ronaldo, player_goalie, other_goalie, player_image, player_image_original, ronaldo_image, x_ball_speed, y_ball_speed, goal_scored, goal_time, goal_side
+    global player_score, opponent_score, coins, soccer_ball, player, ronaldo, player_goalie, other_goalie, player_image, player_image_original, ronaldo_image, x_ball_speed, y_ball_speed, goal_scored, goal_time, goal_side, current_l, next_l
     
+    current_l = "3"
+    next_l = "4"
+
     player_score = 0
     opponent_score = 0
     coins = 0
@@ -818,7 +1099,7 @@ def level_3():
             if event.type == timer_running:
                 time_remaining -= 1
                 if time_remaining <= 0:
-                    level_transition_screen(1, 3) 
+                    level_transition_screen("3","4") 
                     return
             
             if event.type == powerup_running:
@@ -1148,12 +1429,446 @@ def move_second_enemy(second_enemy):
     if second_enemy.x > middle_x + 100:
         second_enemy.x -= 3
 
+def move_third_enemy(third_enemy):
+    if soccer_ball.y < third_enemy.y:
+        third_enemy.y -= 2
+    if soccer_ball.y > third_enemy.y:
+        third_enemy.y += 2
+    
+    middle_x = screen_width // 2
+
+    if third_enemy.x < middle_x - 100:
+        third_enemy.x += 2
+    if third_enemy.x > middle_x + 100:
+        third_enemy.x -= 2
+
+def level_4():
+    level_screen("Level 4 - [Insert Interesting Name]")
+    
+    global player_score, opponent_score, coins, soccer_ball, player, ronaldo, player_goalie, other_goalie, player_image, player_image_original, ronaldo_image, x_ball_speed, y_ball_speed, goal_scored, goal_time, goal_side, current_l, next_l
+    
+    current_l = "4"
+    next_l = "5"
+
+    player_score = 0
+    opponent_score = 0
+    coins = 0
+    ball_activated = False
+
+    x_ball_speed = 0
+    y_ball_speed = 0
+    soccer_ball.center = (screen_width/2, screen_height/2)
+
+    goal_scored = False
+    goal_time = 0
+    goal_side = ""
+    flash_interval = 200  
+    flash_colors = [(255, 255, 255), grey_color] 
+
+    background_image = pygame.image.load("4.png")
+    background_image = pygame.transform.scale(background_image, (screen_width, screen_height))
+
+    game_length_time = 240
+    
+    timer_running = pygame.USEREVENT + 1
+    pygame.time.set_timer(timer_running, 1000)
+    
+    powerup_running = pygame.USEREVENT + 2
+    pygame.time.set_timer(powerup_running, 8000)
+    
+    coin_running = pygame.USEREVENT + 3
+    pygame.time.set_timer(coin_running, 5000)
+    
+    puddle_timer = pygame.USEREVENT + 4
+    pygame.time.set_timer(puddle_timer, 15000)
+    
+    fan_cheer_timer = pygame.USEREVENT + 6
+    pygame.time.set_timer(fan_cheer_timer, 12000)
+    
+    running = True
+    time_remaining = game_length_time
+    
+    powerups = []
+    time_left_size_boost = 0
+    time_left_speed_boost = 0
+    time_left_slow_effect = 0
+    time_left_freeze_enemies = 0
+    time_left_coin_lose_text = 0
+    time_left_goal_lose_text = 0
+
+    normal_player_speed = 7
+    boosted_player_speed = 14
+    slowed_player_speed = 3
+    size_on = False
+    speed_on = False
+    coin_lose = False
+    goal_lose = False
+
+    player_slowed = False
+    enemies_frozen = False
+    
+    coin_object = []
+    
+    mud_puddles = []
+    
+    fan_cheering = False
+    fan_end_time = 0
+    
+    obstacles = []
+    
+    key_down = False
+    key_up = False
+    key_left = False
+    key_right = False
+    
+    second_enemy = pygame.Rect(screen_width // 2, screen_height//2 - 50, 100, 100)
+    second_enemy_image = pygame.image.load("ronaldo.png")
+    second_enemy_image = pygame.transform.scale(second_enemy_image, (100, 100))
+    second_enemy_speed = 3
+
+    third_enemy = pygame.Rect(screen_width // 2 - 100, screen_height//2 - 50, 100, 100)
+    third_enemy_image = pygame.image.load("ronaldo.png")
+    third_enemy_image = pygame.transform.scale(third_enemy_image, (100,100))
+    third_enemy_speed = 2
+    
+    while running:
+        current_time = time.time()
+        
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            
+            if event.type == timer_running:
+                time_remaining -= 1
+                if time_remaining <= 0:
+                    level_transition_screen("4","5") 
+                    return
+            
+            if event.type == powerup_running:
+                if len(powerups) < 2:
+                    powerups.append(create_powerup_level4())
+                    
+            if event.type == coin_running:
+                if len(coin_object) < 3:
+                    coin_object.append(create_coin())
+            
+            if event.type == puddle_timer:
+                if len(mud_puddles) < 4:
+                    mud_puddles.append(create_mud_puddle())
+
+            if event.type == fan_cheer_timer and random.random() > 0.5:
+                fan_cheering = True
+                fan_end_time = current_time + 5
+                if random.random() > 0.5:
+                    player_score += 1
+                else:
+                    obstacles.append(create_obstacle())
+
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_DOWN:
+                    key_down = True
+                if event.key == pygame.K_UP:
+                    key_up = True
+                if event.key == pygame.K_LEFT:
+                    key_left = True
+                if event.key == pygame.K_RIGHT:
+                    key_right = True
+                    
+            if event.type == pygame.KEYUP:
+                if event.key == pygame.K_DOWN:
+                    key_down = False
+                if event.key == pygame.K_UP:
+                    key_up = False
+                if event.key == pygame.K_LEFT:
+                    key_left = False
+                if event.key == pygame.K_RIGHT:
+                    key_right = False
+
+        speed_player_x = 0
+        speed_player_y = 0
+
+        if player_slowed:
+            current_speed = slowed_player_speed
+        elif speed_on:
+            current_speed = boosted_player_speed
+        else:
+            current_speed = normal_player_speed
+
+        if key_down:
+            speed_player_y = current_speed
+        if key_up:
+            speed_player_y = -current_speed
+        if key_left:
+            speed_player_x = -current_speed
+        if key_right:
+            speed_player_x = current_speed
+
+        if size_on and current_time > time_left_size_boost:
+            size_on = False
+            original_center = player.center
+            player_image = player_image_original.copy()
+            player.width, player.height = 100, 100
+            player.center = original_center
+
+        if speed_on and current_time > time_left_speed_boost:
+            speed_on = False
+
+        if player_slowed and current_time > time_left_slow_effect:
+            player_slowed = False
+            
+        if enemies_frozen and current_time > time_left_freeze_enemies:
+            enemies_frozen = False
+            
+        if fan_cheering and current_time > fan_end_time:
+            fan_cheering = False
+
+        if goal_lose and current_speed > time_left_goal_lose_text:
+            goal_lose = False
+        
+        if coin_lose and current_speed > time_left_coin_lose_text:
+            coin_lose = False
+
+        
+        if ball_activated or key_down or key_up or key_left or key_right:
+            if not ball_activated:
+                # Initialize ball speed only once when first key is pressed
+                x_ball_speed = 7 * random.choice((2, -2, -1, 1))
+                y_ball_speed = 7 * random.choice((1, -1, 2, -2))
+                ball_activated = True
+            moving_ball()
+        
+        player.x += speed_player_x
+        player.y += speed_player_y
+        player_out_of_bounds()
+        
+        if not enemies_frozen:
+            ronaldo_movement()
+            move_second_enemy(second_enemy)
+            move_third_enemy(third_enemy)
+
+        powerups_to_remove = []
+        for i, powerup in enumerate(powerups):
+            if player.colliderect(powerup['rect']):
+                if powerup['type'] == 'size':
+                    size_on = True
+                    time_left_size_boost = current_time + 30
+                    original_center = player.center
+                    player_image = pygame.transform.scale(player_image_original, (150, 150))
+                    player.width, player.height = 150, 150
+                    player.center = original_center
+                    
+                elif powerup['type'] == 'speed':
+                    speed_on = True
+                    time_left_speed_boost = current_time + 30
+                    
+                elif powerup['type'] == 'invincible':
+                    player_slowed = False
+                    time_left_slow_effect = 0
+                    
+                elif powerup['type'] == 'freeze':
+                    enemies_frozen = True
+                    time_left_freeze_enemies = current_time + 10
+                
+                elif powerup['type'] == 'coin-lose':
+                    coin_lose = True
+                    time_left_coin_lose_text = current_time + 2
+                    coins -= 1
+                
+                elif powerup['type'] == 'goal-lose':
+                    goal_lose = True 
+                    time_left_goal_lose_text = current_time + 2
+                    player_score -= 1
+                    
+                powerups_to_remove.append(i)
+        
+        for i in sorted(powerups_to_remove, reverse=True):
+            powerups.pop(i)
+        
+        coins_to_remove = []
+        for i, coin in enumerate(coin_object):
+            if player.colliderect(coin):
+                coins += 1
+                coins_to_remove.append(i)
+        
+        for i in sorted(coins_to_remove, reverse=True):
+            coin_object.pop(i)
+            
+        puddles_to_remove = []
+        for i, puddle in enumerate(mud_puddles):
+            if player.colliderect(puddle):
+                player_slowed = True
+                time_left_slow_effect = current_time + 5
+                puddles_to_remove.append(i)
+        
+        for i in sorted(puddles_to_remove, reverse=True):
+            mud_puddles.pop(i)
+            
+        obstacles_to_remove = []
+        for i, obstacle in enumerate(obstacles):
+            if soccer_ball.colliderect(obstacle):
+                x_ball_speed *= -1
+                obstacles_to_remove.append(i)
+            if player.colliderect(obstacle):
+                player_slowed = True
+                time_left_slow_effect = current_time + 3
+                obstacles_to_remove.append(i)
+        
+        for i in sorted(obstacles_to_remove, reverse=True):
+            obstacles.pop(i)
+
+        if soccer_ball.colliderect(second_enemy):
+            x_ball_speed *= -1
+            soccer_ball.x = second_enemy.right
+            y_ball_speed += random.choice([-1, 1]) * 2
+        
+        if soccer_ball.colliderect(third_enemy):
+            x_ball_speed *= -1
+            soccer_ball.x = third_enemy.right
+            y_ball_speed += random.choice([-1, 1]) * 2
+
+        if soccer_ball.y > other_goalie.centery:
+            goalie_movement(other_goalie, 'down')
+        else:
+            goalie_movement(other_goalie, 'up')
+
+        if soccer_ball.y > player_goalie.centery:
+            goalie_movement(player_goalie, 'down')
+        else:
+            goalie_movement(player_goalie, 'up')
+
+        screen.blit(background_image, (0, 0))
+
+        for powerup in powerups:
+            if powerup['type'] == 'size':
+                pygame.draw.rect(screen, (255, 0, 0), powerup['rect'])
+            elif powerup['type'] == 'speed':
+                pygame.draw.rect(screen, (0, 255, 0), powerup['rect'])
+            elif powerup['type'] == 'freeze':
+                pygame.draw.rect(screen, (0, 255, 255), powerup['rect'])
+            elif powerup['type'] == 'coin-lose':
+                pygame.draw.rect(screen, (0,0,0), powerup['rect'])
+            elif powerup['type'] == 'goal-lose':
+                pygame.draw.rect(screen, (0,0,0), powerup['rect'])
+        
+        for coin in coin_object:
+            pygame.draw.ellipse(screen, (255, 215, 0), coin)
+            
+        for puddle in mud_puddles:
+            pygame.draw.ellipse(screen, (139, 69, 19), puddle)
+            
+        for obstacle in obstacles:
+            pygame.draw.rect(screen, (200, 20, 20), obstacle)
+
+        screen.blit(player_image, player)
+        screen.blit(ronaldo_image, ronaldo)
+        
+        if enemies_frozen:
+            frozen_overlay = pygame.Surface((second_enemy.width, second_enemy.height), pygame.SRCALPHA)
+            frozen_overlay.fill((0, 255, 255, 128))
+            screen.blit(second_enemy_image, second_enemy)
+            screen.blit(frozen_overlay, second_enemy)
+
+            frozen_overlay = pygame.Surface((third_enemy.width, third_enemy.height), pygame.SRCALPHA)
+            frozen_overlay.fill((0, 255, 255, 128))
+            screen.blit(third_enemy_image, third_enemy)
+            screen.blit(frozen_overlay, third_enemy)
+            
+            frozen_overlay = pygame.Surface((ronaldo.width, ronaldo.height), pygame.SRCALPHA)
+            frozen_overlay.fill((0, 255, 255, 128))
+            screen.blit(frozen_overlay, ronaldo)
+        else:
+            screen.blit(second_enemy_image, second_enemy)
+            screen.blit(third_enemy_image,third_enemy)
+            
+        pygame.draw.rect(screen, grey_color, player_goalie)
+        pygame.draw.rect(screen, grey_color, other_goalie)
+        pygame.draw.ellipse(screen, grey_color, soccer_ball)
+        pygame.draw.aaline(screen, grey_color, (screen_width/2, 0), (screen_width/2, screen_height))
+        
+        
+        if fan_cheering:
+            cheer_text = timer_font.render("CROWD GOES WILD!", True, (255, 215, 0))
+            screen.blit(cheer_text, (screen_width//2 - 100, screen_height - 50))
+        
+        timer_text = timer_font.render(f"Time: {clock_time(time_remaining)}", True, timer_color)
+        screen.blit(timer_text, (screen_width//2 - 70, 20))
+        
+        score_text = score_font.render(f"{opponent_score} - {player_score}", True, timer_color)
+        screen.blit(score_text, (screen_width//2 - 60, 60))
+        
+        coin_text = timer_font.render(f"Coins: {coins}", True, (255, 215, 0))
+        screen.blit(coin_text, (screen_width - 200, 20))
+        
+        if size_on:
+            size_text = timer_font.render("Size Boost!", True, (255, 0, 0))
+            screen.blit(size_text, (20, 20))
+        
+        if speed_on:
+            speed_text = timer_font.render("Speed Boost!", True, (0, 255, 0))
+            screen.blit(speed_text, (20, 60))
+            
+        if player_slowed:
+            slow_text = timer_font.render("Slowed Down!", True, (139, 69, 19))
+            screen.blit(slow_text, (20, 100))
+            
+        if enemies_frozen:
+            freeze_text = timer_font.render("Enemies Frozen!", True, (0, 255, 255))
+            screen.blit(freeze_text, (20, 140))
+        
+        if coin_lose:
+            coin_lose_text = timer_font.render("You lost a coin!", True, (0,0,0))
+            screen.blit(coin_lose_text, (20, 180))
+
+        if goal_lose:
+            goal_lose_text = timer_font.render("You lost a goal!", True, (0,0,0))
+            screen.blit(goal_lose_text,(20, 200))
+            
+        # Handle goal animation and delayed respawn
+        if goal_scored:
+            current_time = pygame.time.get_ticks()
+            time_since_goal = current_time - goal_time
+            
+            # Flash the appropriate goalie
+            if time_since_goal < 5000:  # During the 5 second delay
+                flash_index = (time_since_goal // flash_interval) % 2
+                flash_color = flash_colors[flash_index]
+                
+                if goal_side == "left":
+                    # Left goal was scored on, flash the left goalie
+                    pygame.draw.rect(screen, flash_color, other_goalie)
+                else:
+                    # Right goal was scored on, flash the right goalie
+                    pygame.draw.rect(screen, flash_color, player_goalie)
+                    
+                # Display "GOAL!" text
+                goal_font = pygame.font.SysFont("monospace", 80)
+                goal_text = goal_font.render("GOAL!", True, (255, 0, 0))
+                screen.blit(goal_text, (screen_width//2 - goal_text.get_width()//2, screen_height//2 - 40))
+            else:
+                # After 5 seconds, reset the ball and clear the goal state
+                goal_scored = False
+                ball_restart()
+        
+        pygame.display.flip()
+        clock.tick(60)
+
+def create_powerup_level4():
+    powerup_type = random.choice(['size', 'speed', 'invincible', 'freeze','coin-lose','goal-lose'])
+    power_x = random.randint(100, screen_width - 100)
+    power_y = random.randint(100, screen_height - 100)
+    
+    powerup_box = pygame.Rect(power_x, power_y, 30, 30)
+    return {'rect': powerup_box, 'type': powerup_type}
+
 def main():
     clock = init_game()
     loading_animation()
     loading_screen()
-    level_1()
-    level_3()
+    #level_1()
+    #level_2()
+    #level_3()
+    level_4()
     #level_5()
     
 
