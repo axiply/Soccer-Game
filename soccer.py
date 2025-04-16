@@ -204,8 +204,11 @@ def screen_switcher():
         level_3()
     elif level4:
         level_4()
+    elif level5:
+        level_5()
     else:
-        game_OVER_Screen()
+        pygame.quit()
+        sys.exit()
 
 # function to draw loading animation
 def loading_animation():
@@ -578,6 +581,14 @@ def level_transition_screen(current_level, next_level):
     # display the text
     level_completed_text = font_LARGEE.render(f"Level {current_level} Completed!", True, pygame.Color("white"))
     score_text = font_smal.render(f"Score: {opponent_score} - {player_score}", True, pygame.Color("white"))
+    
+    # add who won text
+    if player_score > opponent_score:
+        winner_text = font_smal.render("OMG YOU WON!!!", True, pygame.Color("green"))
+    else:
+        winner_text = font_smal.render("THE RONALDO(S) WON!?!", True, pygame.Color("red"))
+    
+    
     coins_text = font_smal.render(f"Coins: {coins}", True, pygame.Color("gold"))
     next_level_text = font_smal.render(f"Next Level in: {countdown_seconds}", True, pygame.Color("white"))
     skip_text = font_smal.render("Press any key to skip", True, pygame.Color("gray"))
@@ -606,7 +617,9 @@ def level_transition_screen(current_level, next_level):
         screen.fill(background_color)
         screen.blit(level_completed_text, (screen_width//2 - level_completed_text.get_width()//2, screen_height//2 - 100))
         screen.blit(score_text, (screen_width//2 - score_text.get_width()//2, screen_height//2 - 50))
-        screen.blit(coins_text, (screen_width//2 - coins_text.get_width()//2, screen_height//2))
+        # Add the winner text below the score
+        screen.blit(winner_text, (screen_width//2 - winner_text.get_width()//2, screen_height//2 - 20))
+        screen.blit(coins_text, (screen_width//2 - coins_text.get_width()//2, screen_height//2 + 10))
         screen.blit(next_level_text, (screen_width//2 - next_level_text.get_width()//2, screen_height//2 + 50))
         screen.blit(skip_text, (screen_width//2 - skip_text.get_width()//2, screen_height//2 + 100))
         pygame.display.flip()
@@ -625,9 +638,15 @@ def level_transition_screen(current_level, next_level):
     elif next_level == "4":
         level4 = True 
         level1 = level2 = level3 = level5 = False
+    elif next_level == "5":
+        level5 = True
+        level1 = level2 = level3 = level4 = False
+    else:
+        level1 = level2 = level3 = level4 = level5 = False
+        pygame.quit()
+        sys.exit()
     
     screen_switcher()
-    
 
 # level one function
 def level_1():
@@ -922,7 +941,7 @@ def level_2():
 
     By: Swanish and Selina
     """
-    level_screen("Level 2: [Insert Cool Name]")
+    level_screen("Level 2: The Faster One")
     # add player_image and other required variables to global
     global player_score, opponent_score, coins, soccer_ball, player, ronaldo, player_goalie, other_goalie, player_image, player_image_original, ronaldo_image, level_num, x_ball_speed,y_ball_speed, goal_scored, current_l, next_l
 
@@ -1090,6 +1109,7 @@ def level_2():
                 y_ball_speed = 9 * random.choice((1, -1, 2, -2))
                 ball_activated = True
             moving_ball()
+
         
         player.x += speed_player_x
         player.y += speed_player_y
@@ -2275,7 +2295,11 @@ def create_powerup_level4():
     powerup_box = pygame.Rect(power_x, power_y, 30, 30)
     return {'rect': powerup_box, 'type': powerup_type}
 
-def game_OVER_Screen():
+def level_5():
+    global current_l, next_l
+
+    current_l = "5"
+    next_l = "6"
 
     # define the colors
     colors = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 0)]
@@ -2287,15 +2311,22 @@ def game_OVER_Screen():
     running = True
     clock = pygame.time.Clock()
     
+    # Add a start time to track elapsed time
+    start_time = pygame.time.get_ticks()
+    
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
-            if event.type == pygame.KEYDOWN:
-                running = False
         
-        # clear the screen abd but a black backround
+        # auto-exit after 5 secosnds
+        current_time = pygame.time.get_ticks()
+        if current_time - start_time >= 5000:
+            pygame.quit()
+            sys.exit()
+        
+        # clear the screen and put a black background
         screen.fill((0, 0, 0))
         
         # display thanks message with changing colors
@@ -2303,13 +2334,12 @@ def game_OVER_Screen():
         text_rect = text.get_rect(center=(screen_width/2, screen_height/2))
         screen.blit(text, text_rect)
         
-        # instruction to exit
         small_font = pygame.font.SysFont("monospace", 24)
-        exit_text = small_font.render("Press any key to exit", True, (255, 255, 255))
+        exit_text = small_font.render("Exiting in " + str(5 - int((current_time - start_time)/1000)) + " seconds...", True, (255, 255, 255))
         exit_rect = exit_text.get_rect(center=(screen_width/2, screen_height/2 + 100))
         screen.blit(exit_text, exit_rect)
         
-        # change color every 30 frames
+        # change color every 500 milliseconds
         if pygame.time.get_ticks() % 500 == 0:
             color_index = (color_index + 1) % len(colors)
         
@@ -2317,11 +2347,12 @@ def game_OVER_Screen():
         clock.tick(60)
     
     return
+
 clock = initialize_game()
 loading_animation()
 loading_screen()
-#level_1()
-#level_2()
-#level_3()
-#level_4()
-game_OVER_Screen()
+level_1()
+'''level_2()
+level_3()
+level_4()'''
+level_5()
