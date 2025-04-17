@@ -319,9 +319,33 @@ def level_screen(level):
     text = font.render(level, True, pygame.Color("white"))
     text_rect = text.get_rect(center=(screen_width // 2, screen_height // 2))
 
+    # brief descriptions for each level
+    desc_font = pygame.font.SysFont("monospace", 20)
+    if level == "Level 1: The Beginnings":
+        description = desc_font.render("This is your first game against Ronaldo!", True, pygame.Color("white")) 
+        description2 = desc_font.render("There are many objects on the field to help you!",True, pygame.Color("white"))
+    
+    if level == "Level 2: The Faster One":
+        description = desc_font.render("Oh no! The ball is getting faster!", True, pygame.Color("white")) 
+        description2 = desc_font.render("There are many objects on the field to help you!",True, pygame.Color("white"))
+
+    if level == "Level 3: Double Trouble":
+        description = desc_font.render("There are more of them?!?!", True, pygame.Color("white")) 
+        description2 = desc_font.render("Careful: Is that rain??",True, pygame.Color("white"))
+
+    if level == "Level 4: Triple Fun":
+        description = desc_font.render("No way! Three of them??", True, pygame.Color("white")) 
+        description2 = desc_font.render("Not all objects on the field will help you!",True, pygame.Color("white"))
+
+    description_rect = description.get_rect(center=(screen_width // 2, screen_height // 2+100))
+    description2_rect = description2.get_rect(center=(screen_width // 2, screen_height // 2+125))
+
     # display the message and wait for a key press
     screen.fill(background_color)
     screen.blit(text, text_rect)
+    screen.blit(description,description_rect)
+    screen.blit(description2,description2_rect)
+
     pygame.display.flip()
 
     start_time = pygame.time.get_ticks()  # Get current time in milliseconds
@@ -516,7 +540,7 @@ def initialize_game():
     pygame.display.set_caption("Mohammed's Soccer")
 
     # setting up the background and scaling the images
-    background_image = pygame.image.load('soccerfields/1.png') 
+    background_image = pygame.image.load('1.png') 
     background_image = pygame.transform.scale(background_image, (screen_width, screen_height)) 
 
     # ball speeds
@@ -966,7 +990,7 @@ def level_2():
     soccer_ball.center = (screen_width/2, screen_height/2)
     ball_activated = False
     
-    background_image = pygame.image.load('soccerfields/2.png') 
+    background_image = pygame.image.load('2.png') 
     background_image = pygame.transform.scale(background_image, (screen_width, screen_height)) 
 
     game_length_time = 120
@@ -1272,7 +1296,7 @@ def level_3():
     By: Swanish and Selina
     """
 
-    level_screen("Level 3 - Double Trouble")
+    level_screen("Level 3: Double Trouble")
     
     # initialize the global variables
     global player_score, opponent_score, coins, soccer_ball, player, ronaldo, player_goalie, other_goalie, player_image, player_image_original, ronaldo_image, x_ball_speed, y_ball_speed, goal_scored, goal_time, goal_side, current_l, next_l
@@ -1300,7 +1324,7 @@ def level_3():
     flash_colors = [(255, 255, 255), grey_color] 
 
     # start background
-    background_image = pygame.image.load("soccerfields/3.png")
+    background_image = pygame.image.load("3.png")
     background_image = pygame.transform.scale(background_image, (screen_width, screen_height))
 
     game_length_time = 240 # game length initialize
@@ -1830,7 +1854,7 @@ def move_third_enemy(third_enemy):
 
 
 def level_4():
-    level_screen("Level 4 - Triple Fun")
+    level_screen("Level 4: Triple Fun")
 
     """
     Starts Level 4, managing player movements, enemies, power-ups, obstacles, and coin collection.
@@ -1870,7 +1894,7 @@ def level_4():
     flash_colors = [(255, 255, 255), grey_color] 
     
     #load background
-    background_image = pygame.image.load("soccerfields/4.png")
+    background_image = pygame.image.load("4.png")
     background_image = pygame.transform.scale(background_image, (screen_width, screen_height))
 
     game_length_time = 240
@@ -2177,8 +2201,9 @@ def level_4():
             elif powerup['type'] == 'coin-lose':
                 pygame.draw.rect(screen, (0,0,0), powerup['rect'])
             elif powerup['type'] == 'goal-lose':
-                pygame.draw.rect(screen, (0,0,0), powerup['rect'])
+                pygame.draw.rect(screen, (0,0,1), powerup['rect'])
         
+
         # for each coin just draw them 
         for coin in coin_object:
             pygame.draw.ellipse(screen, (255, 215, 0), coin)
@@ -2345,6 +2370,15 @@ def level_5():
         text = font.render("THANK YOU FOR PLAYING!! WE HOPE YOU HAD A BLAST :)", True, colors[color_index])
         text_rect = text.get_rect(center=(screen_width/2, screen_height/2))
         screen.blit(text, text_rect)
+
+        text2 = font.render("You have won a lamborghini!!!", True, colors[color_index])
+        text2_rect = text2.get_rect(center=(screen_width/2, screen_height/2+50))
+        screen.blit(text2, text2_rect)
+
+        lambo_image = pygame.image.load('lambo.png') 
+        lambo_image = pygame.transform.scale(lambo_image, (300, 150)) 
+        image_rect = lambo_image.get_rect(center=(screen_width/2, screen_height/2 - 150))
+        screen.blit(lambo_image, image_rect)
         
         small_font = pygame.font.SysFont("monospace", 24)
         exit_text = small_font.render("Exiting in " + str(5 - int((current_time - start_time)/1000)) + " seconds...", True, (255, 255, 255))
