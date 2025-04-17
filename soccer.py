@@ -7,7 +7,7 @@ Date: 2025-04-17
 
 Functions:
 moving_ball()
-player_out_of_bounds()
+player_out()
 ronaldo_movement()
 goalie_movement()
 screen_switcher()
@@ -104,7 +104,7 @@ def moving_ball():
         y_ball_speed = random.randint(-7, 7)
 
 # function for if player leaves the screen
-def player_out_of_bounds():
+def player_out():
     """
     Keeps the player within the screen boundaries.
 
@@ -258,7 +258,8 @@ def loading_animation():
 # function for the loading screen
 def loading_screen():
     """
-    Asks the player to press a key to continue and waits for them to do that 
+    Displays a loading screen with a soccer background image and title.
+    Waits for the player to press any key to continue.
 
     Parameters:
         None
@@ -268,17 +269,28 @@ def loading_screen():
 
     By: Swanish and Selina
     """
-    # define fonts and text
-    font = pygame.font.SysFont("monospace", 40)
-    text = font.render("Press any key to continue...", True, pygame.Color("white"))
-    text_rect = text.get_rect(center=(screen_width // 2, screen_height // 2))
 
-    # display the message and wait for a key press
-    screen.fill(background_color)
-    screen.blit(text, text_rect)
+    # load background image
+    background_img = pygame.image.load("soccer_field.jpg")
+    background_img = pygame.transform.scale(background_img, (screen_width, screen_height))
+    
+    # set up title text
+    title_font = pygame.font.SysFont("monospace", 60)
+    title_text = title_font.render("Soccer Legends", True, pygame.Color("black"))
+    title_rect = title_text.get_rect(center=(screen_width // 2, screen_height // 3))
+    
+    # set up continue text
+    continue_font = pygame.font.SysFont("monospace", 40)
+    continue_text = continue_font.render("Press any key to continue...", True, pygame.Color("gray"))
+    continue_rect = continue_text.get_rect(center=(screen_width // 2, screen_height * 2 // 3))
+
+    # show the text
+    screen.blit(background_img, (0, 0))
+    screen.blit(title_text, title_rect)
+    screen.blit(continue_text, continue_rect)
     pygame.display.flip()
 
-    # wait for a key press to continue
+    # wait for mohammed to press a key before continuign
     waiting = True
     while waiting:
         for event in pygame.event.get():
@@ -804,7 +816,7 @@ def level_1():
         
         player.x += speed_player_x
         player.y += speed_player_y
-        player_out_of_bounds()
+        player_out()
         ronaldo_movement()
 
         powerups_to_remove = []
@@ -1113,7 +1125,7 @@ def level_2():
         
         player.x += speed_player_x
         player.y += speed_player_y
-        player_out_of_bounds()
+        player_out()
         ronaldo_movement()
 
         powerups_to_remove = []
@@ -1487,7 +1499,7 @@ def level_3():
         
         player.x += speed_player_x
         player.y += speed_player_y
-        player_out_of_bounds() # reset the player if they go out of bounds 
+        player_out() # reset the player if they go out of bounds 
         
         # reset the movements when not frozen
         if not enemies_frozen:
@@ -2049,7 +2061,7 @@ def level_4():
         # move the player
         player.x += speed_player_x
         player.y += speed_player_y
-        player_out_of_bounds()
+        player_out() # reset the player if they go out of bounds
         
         # reset the movements when not frozen
         if not enemies_frozen:
