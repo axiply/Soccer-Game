@@ -2,7 +2,7 @@
 Pygame Soccer Game
 ICS3U
 Authors: Swanish and Selina
-Purpose: Create a soccer pong game with power-ups and coins for Mohammed
+Purpose: Create a soccer pong game with power-ups and coins for Mohammed. The first level is basic with a Ronaldo and the player, with a few powerups here and there. The second level has a faster ball speed, one ronaldo and more powerups. The third level has one more ronaldo along with some more powerups, and finally, the last level has 3 Ronaldos and even more powerups! On the ending screen, the student wins a lamborghini.
 Date: 2025-04-17
 
 Functions:
@@ -540,7 +540,7 @@ def initialize_game():
     pygame.display.set_caption("Mohammed's Soccer")
 
     # setting up the background and scaling the images
-    background_image = pygame.image.load('1.png') 
+    background_image = pygame.image.load('soccerfields/1.png') 
     background_image = pygame.transform.scale(background_image, (screen_width, screen_height)) 
 
     # ball speeds
@@ -595,7 +595,7 @@ def level_transition_screen(current_level, next_level):
     and the option to skip to the next level.
 
     Parameters:
-        current_level (str): The level that has just been completed.
+        current_level (str): The current level that was completed.
         next_level (str): The next level to start after the transition.
 
     Returns:
@@ -979,8 +979,7 @@ def level_2():
     """
     level_screen("Level 2: The Faster One")
     # add player_image and other required variables to global
-    global player_score, opponent_score, coins, soccer_ball, player, ronaldo, player_goalie, other_goalie, player_image, player_image_original, ronaldo_image, level_num, x_ball_speed,y_ball_speed, goal_scored, current_l, next_l
-
+    global player_score, opponent_score, coins, soccer_ball, player, ronaldo, player_goalie, other_goalie, player_image, player_image_original, ronaldo_image, level_num, x_ball_speed, y_ball_speed, goal_scored, goal_time, goal_side, current_l, next_l
     # level 2 specific settings
     current_l = "2"
     next_l = "3"
@@ -990,7 +989,7 @@ def level_2():
     soccer_ball.center = (screen_width/2, screen_height/2)
     ball_activated = False
     
-    background_image = pygame.image.load('2.png') 
+    background_image = pygame.image.load('soccerfields/2.png') 
     background_image = pygame.transform.scale(background_image, (screen_width, screen_height)) 
 
     game_length_time = 120
@@ -1324,7 +1323,7 @@ def level_3():
     flash_colors = [(255, 255, 255), grey_color] 
 
     # start background
-    background_image = pygame.image.load("3.png")
+    background_image = pygame.image.load("soccerfields/3.png")
     background_image = pygame.transform.scale(background_image, (screen_width, screen_height))
 
     game_length_time = 240 # game length initialize
@@ -1708,7 +1707,7 @@ def level_3():
             time_since_goal = current_time - goal_time
             
             # flash the appropriate goalie
-            if time_since_goal < 5000:  # During the 5 second delay
+            if time_since_goal < 5000:  # during the 5 second delay
                 flash_index = (time_since_goal // flash_interval) % 2
                 flash_color = flash_colors[flash_index]
                 
@@ -1894,7 +1893,7 @@ def level_4():
     flash_colors = [(255, 255, 255), grey_color] 
     
     #load background
-    background_image = pygame.image.load("4.png")
+    background_image = pygame.image.load("soccerfields/4.png")
     background_image = pygame.transform.scale(background_image, (screen_width, screen_height))
 
     game_length_time = 240
@@ -2397,8 +2396,8 @@ def level_5():
 clock = initialize_game()
 loading_animation()
 loading_screen()
-level_1()
-'''level_2()
+#level_1()
+level_2()
 level_3()
-level_4()'''
+level_4()
 level_5()
